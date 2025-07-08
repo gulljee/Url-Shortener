@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Shortener</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+    <div class="shadow-md bg-white p-8 w-full max-w-md rounded ">
+        <h1 class="mb-4 text-2xl font-bold text-center">URL Shortener</h1>
+        <form id="shorten-form" class="mb-4">
+            <input type="url" id="longURL" placeholder="Enter your long URL" required class="w-full p-3 border border-gray-300 rounded mb-2 ">
+            <button type="submit" class="w-full bg-blue-600 text-white p-3 rounded hover:bg-blue-700 transition">Shorten URL</button>
+        </form>
+        <div id="result" class="text-center text-green-600 break-words" ></div>
+    </div>
+    <script>
+        const form = document.getElementById("shorten-form");
+        const resultDiv = document.getElementById("result");
+        
+        form.addEventListener("submit",async(e)=>{
+            e.preventDefault();
+            resultDiv.textContent = "Shortening"
+
+            const longUrl = document.getElementById("longURL").value;
+            try{
+                const response = await fetch('/api/shorten',{
+                    method:'POST',
+                    headers : {'Content-Type':'application/json'},
+                    body : JSON.stringify({longUrl}),
+                });
+                const data = await response.json();
+
+                if(response.ok){
+                    resultDiv.innerHTML = `Short URL: <a href="http://${data.shortUrl}" target="_blank"  class="text-blue-400 underline">${data.shortUrl}</a>`;
+                } else{
+                    resultDiv.textContent = data.error || 'Error shortening URL';
+                }
+            }
+            catch(error){
+                resultDiv.textContent = "Server error";
+            }
+        });
+    
+    </script>
+
+</body>
+
+</html>
